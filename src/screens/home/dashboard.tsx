@@ -5,6 +5,8 @@ import Navbarmenu from 'screens/contents/components/gen/navigator/navbarmenu'
 import { reportdata } from 'types/interfaces'
 import { fetchdata } from '../../firebase/function'
 import './styles/styles.css'
+import { collection, getDocs, onSnapshot } from '@firebase/firestore'
+import { db } from '../../firebase/'
 
 
 
@@ -15,18 +17,24 @@ export default function Home({}) {
   const [issuccess, setissuccess] = useState(false);
   const [timer, settimer] = useState(5)
 
-  const fetchjobdata =async() => {
-      
-    const thisdata: reportdata[] = await fetchdata("incident", false)||[];
-      console.log(thisdata.length)
-      setjobdata(thisdata)
-  }
-
   useEffect(() => {
-      fetchjobdata()
-      console.log(isloading)
-      console.log(issuccess)
-  }, [])
+    const incidentCollection = collection(db, "incident");
+  
+    const unsubscribe = onSnapshot(incidentCollection, (querySnapshot) => {
+      const updatedData: (reportdata & { id: string })[] = [];
+      querySnapshot.forEach((doc) => {
+        updatedData.push({ id: doc.id, ...doc.data() } as (reportdata & { id: string }));
+      });
+      setjobdata(updatedData);
+    });
+  
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+
+
 
   
   useEffect(() => {
@@ -41,7 +49,6 @@ export default function Home({}) {
       } else {
         settimer(5)
         setissuccess(false)
-        fetchjobdata();
       }
     } 
     console.log(isloading)
