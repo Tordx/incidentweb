@@ -616,3 +616,7 @@ th {
 .disabled-button {
   background-color: #808080;
 }
+
+.enable-button {
+  background-color: #ff0000;
+}

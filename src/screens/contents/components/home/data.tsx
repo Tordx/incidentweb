@@ -165,7 +165,7 @@ export default function Data({ item,  isLoading, isSuccess }: { item: reportdata
                   </div>
                   <br/>
                   <div style = {{justifyContent: 'flex-end', alignItems: 'flex-end', width: '100%', marginTop: 10}}>
-                    <button className={item.responded ? 'disabled-button' : ''} onClick={() => dispatchunit(item.incidentID, item.responded)}>Dispatch</button>
+                    <button className={item.responded ? 'disabled-button' : 'enable-button'} onClick={() => dispatchunit(item.incidentID, item.responded)}>Dispatch</button>
                   </div>
                   <br/>
                   <Maps coordinates = {item.coordinates} />
