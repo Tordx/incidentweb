@@ -7,7 +7,8 @@ import { fetchdata } from '../../firebase/function'
 import './styles/styles.css'
 import { collection, getDocs, onSnapshot } from '@firebase/firestore'
 import { db } from '../../firebase/'
-
+import useSound from 'use-sound';
+import alert from '../../sounds/alarm.mp3'
 
 
 export default function Home({}) {
@@ -15,9 +16,13 @@ export default function Home({}) {
   const [jobdata, setjobdata] = useState<reportdata[]>([])
   const [isloading, setisloading] = useState(false);
   const [issuccess, setissuccess] = useState(false);
-  const [timer, settimer] = useState(5)
+  const [timer, settimer] = useState(5);
+  const [newalert, setnewalert] = useState(false)
+  const [play,{stop}] = useSound(alert); 
 
   useEffect(() => {
+
+    const audio = new Audio(alert)
     const incidentCollection = collection(db, "incident");
   
     const unsubscribe = onSnapshot(incidentCollection, (querySnapshot) => {
@@ -25,17 +30,39 @@ export default function Home({}) {
       querySnapshot.forEach((doc) => {
         updatedData.push({ id: doc.id, ...doc.data() } as (reportdata & { id: string }));
       });
-      setjobdata(updatedData);
+      
+      const nonRespondedData = updatedData.filter((item) => !item.responded);
+      if(nonRespondedData.length) {
+        audio.muted = false;
+        audio.play()
+      }
+      setjobdata(nonRespondedData);
     });
-  
+
     return () => {
-      unsubscribe();
+        unsubscribe();
     };
   }, []);
 
-
-
-
+  useEffect(() => {
+    if (newalert) {
+      play();
+      showNotification('New Report Incoming', { body: 'Click to view the new report' });
+    }
+  }, [newalert]);
+  
+  const showNotification = (title: string, options: any) => {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification(title, options);
+    } else if ('Notification' in window && Notification.permission !== 'denied') {
+      Notification.requestPermission().then(function (permission) {
+        if (permission === 'granted') {
+          new Notification(title, options);
+        }
+      });
+    }
+  };
+  
   
   useEffect(() => {
 
@@ -71,6 +98,14 @@ export default function Home({}) {
           <div className="loading-content success-modal">
             <h2>Dispatch Successful</h2>
             <p>Make sure the dispatch unit is on their way.</p>
+          </div>
+        </div>
+      }
+      {newalert && 
+        <div className="loading-modal">
+          <div className="loading-content newalert-modal">
+            <h2>NEW REPORT INCOMING!!</h2>
+            <button onClick={() => {stop(); setnewalert(false)}}>View</button>
           </div>
         </div>
       }

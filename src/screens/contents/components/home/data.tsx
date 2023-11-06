@@ -123,6 +123,7 @@ export default function Data({ item,  isLoading, isSuccess }: { item: reportdata
                     icon={faCircleExclamation}
                     style={{ padding: 5, width: 100, height: 100    , color: 'red', marginRight: 10, background: '#fff', borderRadius: 100 }}
                   />
+                  
                   <span>
                     <h2>{item.reporttype} Report Alert!</h2>
                     <span className='location-container'>

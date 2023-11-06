@@ -247,6 +247,12 @@
   padding: 20px;
 }
 
+.newalert-modal {
+  background-color: #ff0000; /* Green background color */
+  color: #fff; /* White text color */
+  padding: 20px;
+}
+
 .no-data-container {
   display: flex;
   flex-direction: column;
