@@ -66,6 +66,28 @@ export default function Home({}) {
       });
     }
   };
+
+  const requestNotificationPermission = async () => {
+    if ('Notification' in window) {
+      if (Notification.permission !== 'granted') {
+        try {
+          const permission = await Notification.requestPermission();
+          if (permission === 'granted') {
+            console.log('Notification permission granted.');
+          } else {
+            console.warn('Notification permission denied.');
+          }
+        } catch (error) {
+          console.error('Error requesting notification permission:', error);
+        }
+      }
+    }
+  };
+  
+  // Call this function when your component mounts
+  useEffect(() => {
+    requestNotificationPermission();
+  }, []);
   
   
   useEffect(() => {
