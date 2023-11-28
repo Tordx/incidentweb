@@ -27,6 +27,7 @@ import { db } from '..';
         date: doc.data().date,
         responded: doc.data().responded,
         recording: doc.data().recording,
+        responder: doc.data().responder
       })
     })
 

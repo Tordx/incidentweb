@@ -1,12 +1,13 @@
 import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useEffect, useState } from 'react';
-import { reportdata } from '../../../../types/interfaces';
+import React, { useContext, useEffect, useState } from 'react';
+import { logindata, reportdata } from '../../../../types/interfaces';
 import Maps from './map';
 import { CalculateDistance } from '../../../../firebase/function';
 import ReactAudioPlayer from 'react-audio-player';
-import { doc, getDocs, updateDoc } from 'firebase/firestore';
+import { collection, doc, getDocs, updateDoc } from 'firebase/firestore';
 import { db } from '../../../../firebase';
+import { AuthContext } from 'auth';
 
 export default function Data({ item,  isLoading, isSuccess }: { item: reportdata[], isLoading: (e: boolean) => void, isSuccess: (e: boolean) => void }) {
 
@@ -14,8 +15,31 @@ export default function Data({ item,  isLoading, isSuccess }: { item: reportdata
   const [isopenArray, setIsOpenArray] = useState(Array(item.length).fill(false));
   const [location, setLocation] = useState<{ latitude: number; longitude: number }>();
   const [locationStrings, setLocationStrings] = useState<string[]>(Array(item.length).fill(''));
+  const [responder, setresponder] = useState<logindata[]>([])
+  const { currentUser } = useContext(AuthContext);
 
   useEffect(() => {
+    const getResponder = async() => {
+      const querySnapshot = await getDocs(collection(db, 'user'));
+      const thisdata: logindata[] = []
+      querySnapshot.forEach((doc) => {
+        if(doc.data().uid === currentUser?.uid){
+          thisdata.push({
+            agencyname: doc.data().agencyname,
+            contactnumber: doc.data().contactnumber,
+            email: doc.data().email,
+            photoURL: doc.data().photoURL,
+            type: doc.data().type,
+            uid: doc.data().uid,
+            username: doc.data().username,
+            userType: doc.data().userType,
+            responder: doc.data().responder,
+          })
+        }
+      })
+      setresponder(thisdata)
+    }
+    getResponder()
     const getReverseGeocoding = async (latitude: number, longitude: number, index: number) => {
       const reverseGeocodingUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`;
       console.log(longitude);
@@ -77,6 +101,8 @@ export default function Data({ item,  isLoading, isSuccess }: { item: reportdata
     fetchLocation();
   }, []);
 
+
+
   const dispatchunit = async (incidentID: string, responded: boolean) => {
     isLoading(true)
     if(!responded){
@@ -86,6 +112,7 @@ export default function Data({ item,  isLoading, isSuccess }: { item: reportdata
       
       await updateDoc(incidentDocRef, {
         responded: true,
+        responder: responder[0].responder
       }).then(() => {
         isLoading(false)
         isSuccess(true)
@@ -216,6 +243,10 @@ export default function Data({ item,  isLoading, isSuccess }: { item: reportdata
             </div>
             <button onClick={() => toggleIsOpen(index)}>{isopenArray[index] ? 'Hide' : 'View'}</button>
             <br />
+            <span className='location-container'>
+                      <span className='h4-data-padding'>Location:</span> {item.responder || 'No responder yet'}
+                    </span>
+                    <br/>
           </div>
         );
       })}

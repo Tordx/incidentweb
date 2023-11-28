@@ -48,6 +48,7 @@ getUserData();
             userType: doc.data().userType,
             uid: doc.data().uid,
             username: doc.data().username,
+            responder: doc.data().responder
         });
       }
     });
@@ -59,6 +60,7 @@ getUserData();
         const email = loginemail;
         const password = loginpassword;
         await signInWithEmailAndPassword(auth, email, password);
+        
         navigate("/admin/dashboard");
       } else {
         alert("The provided email does not belong to an admin user.");

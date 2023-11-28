@@ -12,6 +12,7 @@ export interface logindata {
   uid: string,
   username: string,
   userType: string,
+  responder: string,
   
 }
 
@@ -35,7 +36,7 @@ export interface reportdata {
   date: string,
   responded: boolean,
   recording: string,
-
+  responder: string,
 
 
 }
