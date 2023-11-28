@@ -9,8 +9,12 @@ import { collection, doc, getDocs, updateDoc } from 'firebase/firestore';
 import { db } from '../../../../firebase';
 import { AuthContext } from 'auth';
 
-export default function Data({ item,  isLoading, isSuccess }: { item: reportdata[], isLoading: (e: boolean) => void, isSuccess: (e: boolean) => void }) {
-
+export default function Data({ item,  isLoading, isSuccess, onClick }: { item: reportdata[], isLoading: (e: boolean) => void, isSuccess: (e: boolean) => void, onClick: (e: any) => void, }) {
+  item.sort((a, b) => {
+    const dateA: any = new Date(b.date);
+    const dateB: any = new Date(a.date);
+    return dateA - dateB;
+  });
   const [on, seton] = useState(false)
   const [isopenArray, setIsOpenArray] = useState(Array(item.length).fill(false));
   const [location, setLocation] = useState<{ latitude: number; longitude: number }>();
@@ -101,18 +105,39 @@ export default function Data({ item,  isLoading, isSuccess }: { item: reportdata
     fetchLocation();
   }, []);
 
-
+  const getCurrentTime = () => {
+    const now = new Date();
+    let hours = now.getHours();
+    const minutes = now.getMinutes();
+  
+    // Determine whether it's AM or PM
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+  
+    // Convert 24-hour format to 12-hour format
+    hours = hours % 12 || 12;
+  
+    // Format hours and minutes to ensure they have leading zeros if needed
+    const formattedHours = hours < 10 ? `0${hours}` : hours;
+    const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+  
+    // Create a string in the format HH:MM AM/PM
+    const currentTimeString = `${formattedHours}:${formattedMinutes} ${ampm}`;
+  
+    return currentTimeString;
+  };
 
   const dispatchunit = async (incidentID: string, responded: boolean) => {
     isLoading(true)
+    
     if(!responded){
     try {
-
+      const time = getCurrentTime()
       const incidentDocRef = doc(db, 'incident', incidentID);
-      
-      await updateDoc(incidentDocRef, {
+      console.log(responder)
+        await updateDoc(incidentDocRef, {
         responded: true,
-        responder: responder[0].responder
+        responder: responder[0].responder,
+        time: time,
       }).then(() => {
         isLoading(false)
         isSuccess(true)
@@ -158,7 +183,7 @@ export default function Data({ item,  isLoading, isSuccess }: { item: reportdata
                     </span>
                     <br/>
                     <span className='location-container'>
-                      <span className='h4-data-padding'>Date/Time: </span> {formattedDate}
+                      <span className='h4-data-padding'>Date/Time: </span> {formattedDate} {item?.time ? `| ${item.time} `: ''}
                     </span>
                       <br/>
                       <br/>
@@ -193,7 +218,7 @@ export default function Data({ item,  isLoading, isSuccess }: { item: reportdata
                   </div>
                   <br/>
                   <div style = {{justifyContent: 'flex-end', alignItems: 'flex-end', width: '100%', marginTop: 10}}>
-                    <button className={item.responded ? 'disabled-button' : 'enable-button'} onClick={() => dispatchunit(item.incidentID, item.responded)}>Dispatch</button>
+                  <button className={item.responded ? 'disabled-button' : 'enable-button'} onClick={() => { dispatchunit(item.incidentID, item.responded); onClick(item); }}>Dispatch</button>
                   </div>
                   <br/>
                   <Maps coordinates = {item.coordinates} />
@@ -241,12 +266,12 @@ export default function Data({ item,  isLoading, isSuccess }: { item: reportdata
               )}
 
             </div>
-            <button onClick={() => toggleIsOpen(index)}>{isopenArray[index] ? 'Hide' : 'View'}</button>
+            <button onClick={() => {toggleIsOpen(index)}}>{isopenArray[index] ? 'Hide' : 'View'}</button>
             <br />
             <span className='location-container'>
-                      <span className='h4-data-padding'>Location:</span> {item.responder || 'No responder yet'}
-                    </span>
-                    <br/>
+              <span className='h4-data-padding'>Responder:</span> {item.responder || 'No responder yet'}
+            </span>
+            <br/>
           </div>
         );
       })}

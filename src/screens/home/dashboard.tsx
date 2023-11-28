@@ -34,7 +34,7 @@ export default function Home({}) {
       const nonRespondedData = updatedData.filter((item) => !item.responded);
       if(nonRespondedData.length) {
         audio.muted = false;
-        audio.play()
+        setnewalert(true)
       }
       setjobdata(nonRespondedData);
     });
@@ -48,8 +48,10 @@ export default function Home({}) {
     if (newalert) {
       play();
       showNotification('New Report Incoming', { body: 'Click to view the new report' });
+    } else {
+      stop()
     }
-  }, [newalert]);
+  }, [newalert, play, stop]);
   
   const showNotification = (title: string, options: any) => {
     if ('Notification' in window && Notification.permission === 'granted') {
@@ -101,14 +103,14 @@ export default function Home({}) {
           </div>
         </div>
       }
-      {newalert && 
+      {/* {newalert && 
         <div className="loading-modal">
           <div className="loading-content newalert-modal">
             <h2>NEW REPORT INCOMING!!</h2>
             <button onClick={() => {stop(); setnewalert(false)}}>View</button>
           </div>
         </div>
-      }
+      } */}
       <Header menu={Navbarmenu}/>
       <div className='data-wrapper'>
         {jobdata.length == 0 ? <div className = 'no-data-container'>
@@ -117,7 +119,7 @@ export default function Home({}) {
           <p>While there are no active emergencies, it is crucial for all emergency response teams to remain on high alert and maintain readiness. Regular equipment checks, team briefings, and communication drills are essential to ensure a swift and coordinated response in case of an unforeseen incident.</p>
         </div>
         :
-        <Data item={jobdata} isLoading={setisloading} isSuccess = {setissuccess}/>}
+        <Data item={jobdata} isLoading={setisloading} isSuccess = {setissuccess} onClick={() => {stop()}}/>}
       </div>
     </div>
   )

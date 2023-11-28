@@ -21,7 +21,7 @@ export interface reportdata {
   _reporttype: any,
   _report: any,
   type: string,
-  time: number,
+  time: string,
   incidentID: string,
   coordinates: [number, number],
   description: string,

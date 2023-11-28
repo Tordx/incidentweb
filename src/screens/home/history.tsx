@@ -36,7 +36,7 @@ export default function History({}: Props) {
           <p>While there are no active emergencies, it is crucial for all emergency response teams to remain on high alert and maintain readiness. Regular equipment checks, team briefings, and communication drills are essential to ensure a swift and coordinated response in case of an unforeseen incident.</p>
         </div>
         :
-        <Data item={jobdata} isLoading={setisloading} isSuccess = {setissuccess}/>}
+        <Data item={jobdata} isLoading={setisloading} isSuccess = {setissuccess} onClick={() => {}}/>}
       </div>
     </div>
   )
