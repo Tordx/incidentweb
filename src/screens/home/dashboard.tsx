@@ -17,7 +17,8 @@ export default function Home({}) {
   const [isloading, setisloading] = useState(false);
   const [issuccess, setissuccess] = useState(false);
   const [timer, settimer] = useState(5);
-  const [newalert, setnewalert] = useState(false)
+  const [newalert, setnewalert] = useState(false);
+  const [close, setclose] = useState(false)
   const [play,{stop}] = useSound(alert); 
 
   useEffect(() => {
@@ -35,6 +36,7 @@ export default function Home({}) {
       if(nonRespondedData.length) {
         audio.muted = false;
         setnewalert(true)
+        setclose(true)
       }
       setjobdata(nonRespondedData);
     });
@@ -51,7 +53,7 @@ export default function Home({}) {
     } else {
       stop()
     }
-  }, [newalert, play, stop]);
+  }, [newalert]);
   
   const showNotification = (title: string, options: any) => {
     if ('Notification' in window && Notification.permission === 'granted') {
@@ -103,14 +105,14 @@ export default function Home({}) {
           </div>
         </div>
       }
-      {/* {newalert && 
+      {close && 
         <div className="loading-modal">
           <div className="loading-content newalert-modal">
             <h2>NEW REPORT INCOMING!!</h2>
-            <button onClick={() => {stop(); setnewalert(false)}}>View</button>
+            <button onClick={() => {setclose(false)}}>View</button>
           </div>
         </div>
-      } */}
+      }
       <Header menu={Navbarmenu}/>
       <div className='data-wrapper'>
         {jobdata.length == 0 ? <div className = 'no-data-container'>
@@ -119,7 +121,7 @@ export default function Home({}) {
           <p>While there are no active emergencies, it is crucial for all emergency response teams to remain on high alert and maintain readiness. Regular equipment checks, team briefings, and communication drills are essential to ensure a swift and coordinated response in case of an unforeseen incident.</p>
         </div>
         :
-        <Data item={jobdata} isLoading={setisloading} isSuccess = {setissuccess} onClick={() => {stop()}}/>}
+        <Data item={jobdata} isLoading={setisloading} isSuccess = {setissuccess} onClick={() => {setnewalert(false)}}/>}
       </div>
     </div>
   )
