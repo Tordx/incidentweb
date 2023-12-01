@@ -27,7 +27,13 @@ import { db } from '..';
         date: doc.data().date,
         responded: doc.data().responded,
         recording: doc.data().recording,
-        responder: doc.data().responder
+        responder: doc.data().responder,
+        barangay: doc.data().barangay,
+        incidenttype: doc.data().incidenttype,
+        valid: doc.data().valid,
+        archive: doc.data().archive,
+        responderID: doc.data().responderID,
+        actualincident: doc.data().actualincident,
       })
     })
 

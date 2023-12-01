@@ -9,8 +9,31 @@ import { collection, doc, getDocs, updateDoc } from 'firebase/firestore';
 import { db } from '../../../../firebase';
 import { AuthContext } from 'auth';
 
+const barangays: string[] = [
+  "Select Barangay",
+  'Bantogon',
+  'Cadiz',
+  'Datu Ito Andong',
+  'Datu Wasay',
+  'Dumangas Nuevo',
+  'Hinalaan',
+  'Limulan',
+  'Nalilidan',
+  'Obial',
+  'Pag-asa (Sultan Gunting Mopak)',
+  'Paril',
+  'Poblacion',
+  'Sabanal',
+  'Sangay',
+  'Santa Clara',
+  'Santa Maria',
+];
+
 export default function Data({ item,  isLoading, isSuccess, onClick }: { item: reportdata[], isLoading: (e: boolean) => void, isSuccess: (e: boolean) => void, onClick: (e: any) => void, }) {
-  item.sort((a, b) => {
+
+  const data: reportdata[] = item 
+  
+  data.sort((a, b) => {
     const dateA: any = new Date(b.date);
     const dateB: any = new Date(a.date);
     return dateA - dateB;
@@ -21,6 +44,10 @@ export default function Data({ item,  isLoading, isSuccess, onClick }: { item: r
   const [locationStrings, setLocationStrings] = useState<string[]>(Array(item.length).fill(''));
   const [responder, setresponder] = useState<logindata[]>([])
   const { currentUser } = useContext(AuthContext);
+  const [barangay, setbarangay] = useState<string>(data[0].barangay);
+  const [valid, setvalid] = useState<string>(data[0].valid);
+  const [incidenttype, setincidenttype] = useState<string>(data[0].incidenttype);
+  const [actualincident, setactualincident] = useState<string>(data[0].actualincident);
 
   useEffect(() => {
     const getResponder = async() => {
@@ -138,6 +165,7 @@ export default function Data({ item,  isLoading, isSuccess, onClick }: { item: r
         responded: true,
         responder: responder[0].responder,
         time: time,
+        responderID: currentUser?.uid,
       }).then(() => {
         isLoading(false)
         isSuccess(true)
@@ -149,6 +177,34 @@ export default function Data({ item,  isLoading, isSuccess, onClick }: { item: r
       console.error('Error updating document:', error);
     }} else if(responded){
         return
+    }
+  };
+  const archive = async (incidentID: string) => {
+    isLoading(true)
+    if(!incidenttype && !actualincident && !valid && !barangay){
+      alert('incident must be validated')
+      isLoading(false)
+    } else {
+      try {
+        const incidentDocRef = doc(db, 'incident', incidentID);
+        console.log(responder)
+          await updateDoc(incidentDocRef, {
+          archive: true,
+          incidenttype: incidenttype,
+          actualincident: actualincident,
+          valid: valid,
+          barangay: barangay,
+
+        }).then(() => {
+          isLoading(false)
+          isSuccess(true)
+        })
+        
+        console.log('Document successfully updated.');
+      } catch (error) {
+        isLoading(false)
+        console.error('Error updating document:', error);
+      }
     }
   };
   
@@ -200,7 +256,7 @@ export default function Data({ item,  isLoading, isSuccess, onClick }: { item: r
                       style={{ padding: 5, width: 100, height: 100, color: 'red', marginRight: 10, background: '#fff', borderRadius: 100 }}
                     />
                      <span>
-                    <h2>{item.reporttype} Report Alert!</h2>
+                    <h2>{data.length > 0 ? data[0].reporttype : ''} Report Alert!</h2>
                     <span className='location-container'>
                       <span className='h4-data-padding'>Location:</span> {locationStrings[index]}
                     </span>
@@ -215,24 +271,58 @@ export default function Data({ item,  isLoading, isSuccess, onClick }: { item: r
                      {result} KM away from you
                     </span>
                   </span>
+                  </div>  
+                  <br/>
+                  {data.length > 0 && data[0].responded && <span className='input-container'>
+                  <select disabled = {data.some(item => item.archive)} defaultValue={'Select Validation'} value={valid} onChange={(e) => setvalid(e.target.value)}>
+                      <option disabled defaultValue = {'Select Validation'} key={index}>Select Validation</option>
+                      <option  value = {'valid'} key={index}>Valid</option>
+                      <option  value = {'invalid'} key={index}>Invalid</option>
+                  </select>
+                  <select disabled = {data.some(item => item.archive)} defaultValue={'Select Incident Type'} value = {incidenttype}  onChange={(e) => setincidenttype(e.target.value)}>
+                      <option disabled defaultValue = {'Select Incident Type'} key={0}>Select Incident Type</option>
+                      <option  value = {'Accidents'} key={1}>Accidents</option>
+                      <option  value = {'Natural/man-made calamities'} key={2}>Natural/man-made calamities</option>
+                      <option  value = {'Crime Incidents'} key={3}>Crime Incidents</option>
+                  </select>
+                  <input disabled = {data.some(item => item.archive)} placeholder='Actual Incident' value = {actualincident} onChange={(e) => setactualincident(e.target.value)} />
+                  <select disabled = {data.some(item => item.archive)}defaultValue={'Select Barangay'}  onChange={(e) => setbarangay(e.target.value)}>
+                    {barangays && barangays.map((item: string, index: number) => (
+                      <option disabled = {item === 'Select Barangay'} value = {item[index]} key={index}>{item}</option>
+                    ))}
+                  </select>
+                  </span>
+                  }
+                  <div style = {{justifyContent: data[0].responded ? 'space-between' : 'flex-end', alignItems: 'flex-end', width: '100%', marginTop: 10}}>
+                  {data.some(item => item.responded && !item.archive) ? (
+                    <button
+                      className={'enable-button'}
+                      onClick={() => {
+                          archive(data[0].incidentID);
+                          onClick(item);
+                        
+                      }}
+                    >
+                      Validate and Archive
+                    </button>
+                  ) : (
+                    <></>
+                  )}
+                  <button disabled = {data[0].responded === true} className={data[0].responded ? 'disabled-button' : 'enable-button'} onClick={() => { dispatchunit(item.incidentID, item.responded); onClick(item); }}>Dispatch</button>
                   </div>
                   <br/>
-                  <div style = {{justifyContent: 'flex-end', alignItems: 'flex-end', width: '100%', marginTop: 10}}>
-                  <button className={item.responded ? 'disabled-button' : 'enable-button'} onClick={() => { dispatchunit(item.incidentID, item.responded); onClick(item); }}>Dispatch</button>
-                  </div>
-                  <br/>
-                  <Maps coordinates = {item.coordinates} />
+                  <Maps coordinates = {data.length > 0 ? data[0].coordinates : [0,0]} />
                   <span className='contact-number'>
                     <h4> Reporter Contact Number:{'    '}</h4>
-                    <p>{' '}{item.number}</p>
+                    <p>{' '}{data.length > 0 ? data[0].number : ''}</p>
                   </span>
                   <br/>
                   <span className='report-image'>
                     <div>
                     <p>
-                      <h4>Incident Details</h4>{item.description}
+                      <h4>Incident Details</h4>{data.length > 0 ? data[0].description :''}
                     </p>
-                    {item.media !== 'No Image' ? <img src= {item.media}  width={'100%'} height={'250px'} className='report-image' /> 
+                    {data.length > 0 ? '' : data[0].media !== 'No Image' ? <img src= {item.media}  width={'100%'} height={'250px'} className='report-image' /> 
                     :
                     <h3>{item.media}</h3>
                     }
@@ -241,7 +331,7 @@ export default function Data({ item,  isLoading, isSuccess, onClick }: { item: r
                   <br/>
                   <div className='report-recording'>
                   <ReactAudioPlayer
-                    src= {item.recording}
+                    src= {data.length > 0 ? data[0].recording : ''}
                     controls
                     style={{alignItems: 'center', justifyContent: 'center'}}
                   />
@@ -256,9 +346,9 @@ export default function Data({ item,  isLoading, isSuccess, onClick }: { item: r
                     </thead>
                     <tbody>
                         <tr>
-                        <td>{item.victiminfo[0].names && item.victiminfo[0].names.map((name) => <div key={name}>{name}</div>)}</td>
-                        <td>{item.victiminfo[0].gender &&  item.victiminfo[0].age.map((gender) => <div key={gender}>{gender}</div>)}</td>
-                        <td>{item.victiminfo[0].age && item.victiminfo[0].gender.map((age) => <div key={age}>{age}</div>)}</td>
+                        <td>{data.length === 0 ? [] : data[0].victiminfo[0].names && data[0].victiminfo[0].names.map((name) => <div key={name}>{name}</div>)}</td>
+                        <td>{data.length === 0 ? [] : data[0].victiminfo[0].age &&  data[0].victiminfo[0].age.map((gender) => <div key={gender}>{gender}</div>)}</td>
+                        <td>{data.length === 0 ? [] : data[0].victiminfo[0].gender && data[0].victiminfo[0].gender.map((age) => <div key={age}>{age}</div>)}</td>
                         </tr>
                     </tbody>
                   </table>
@@ -269,7 +359,7 @@ export default function Data({ item,  isLoading, isSuccess, onClick }: { item: r
             <button onClick={() => {toggleIsOpen(index)}}>{isopenArray[index] ? 'Hide' : 'View'}</button>
             <br />
             <span className='location-container'>
-              <span className='h4-data-padding'>Responder:</span> {item.responder || 'No responder yet'}
+              <span className='h4-data-padding'>Responder:</span> {data.length &&  data[0].responder ? data[0].responder : 'No responder yet'}
             </span>
             <br/>
           </div>

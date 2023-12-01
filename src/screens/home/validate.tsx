@@ -9,18 +9,17 @@ import { AuthContext } from 'auth'
 
 type Props = {}
 
-export default function History({}: Props) {
+export default function Validate({}: Props) {
 
   const [jobdata, setjobdata] = useState<reportdata[]>([])
   const [isloading, setisloading] = useState(false);
   const [issuccess, setissuccess] = useState(false);
-  const [timer, settimer] = useState(5);
-  const {currentUser} = useContext(AuthContext)
-
+  const [timer, settimer] = useState(5)
+	const {currentUser} = useContext(AuthContext)
   const fetchjobdata =async() => {
       
     const thisdata: reportdata[] = await fetchdata("incident", true)||[];
-    const filteredData = thisdata.filter((item) => item.archive && item.responderID === currentUser?.uid)
+    const filteredData = thisdata.filter((item) => !item.archive && item.responderID === currentUser?.uid)
       setjobdata(filteredData)
   }
 
@@ -40,6 +39,7 @@ export default function History({}: Props) {
       } else {
         settimer(5)
         setissuccess(false)
+        window.location.reload();
       }
     } 
     console.log(isloading)
@@ -48,7 +48,7 @@ export default function History({}: Props) {
 
   return (
     <div className = 'container'>
-      {isloading && 
+        {isloading && 
         <div className='loading-modal'>
           <div className='loading-content'>
             <div className='spinner'></div>
@@ -59,8 +59,8 @@ export default function History({}: Props) {
        {issuccess && 
         <div className="loading-modal">
           <div className="loading-content success-modal">
-            <h2>Dispatch Successful</h2>
-            <p>Make sure the dispatch unit is on their way.</p>
+            <h2>Archived Successful</h2>
+            <p>You can check the History tab for all archived incidents.</p>
           </div>
         </div>
       }
@@ -68,8 +68,8 @@ export default function History({}: Props) {
       <div className='data-wrapper'>
         {jobdata.length == 0 ? <div className = 'no-data-container'>
           <img src={'https://i.imgur.com/QS4Hx2T.png'}/>
-          <h2>No History Yet</h2>
-          <p>It is crucial for all emergency response teams to remain on high alert and maintain readiness. Regular equipment checks, team briefings, and communication drills are essential to ensure a swift and coordinated response in case of an unforeseen incident.</p>
+          <h2>Nothing to Validate</h2>
+          <p>While there are no report to validate, it is crucial for all emergency response teams to remain on high alert and maintain readiness. Regular equipment checks, team briefings, and communication drills are essential to ensure a swift and coordinated response in case of an unforeseen incident.</p>
         </div>
         :
         <Data item={jobdata} isLoading={setisloading} isSuccess = {setissuccess} onClick={() => {}}/>}

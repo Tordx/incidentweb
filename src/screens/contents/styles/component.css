@@ -26,9 +26,9 @@
   background-color: transparent;
   border: none;
   box-shadow: 0px 0px 0px;
-  color: #000;
+  color: red;
   font-size: 20px;
-  font-weight: 300;
+  font-weight: 700;
   font-family: 'Montserrat';
   margin-right: 10px;
   cursor: pointer;
@@ -619,4 +619,49 @@ th {
 
 .enable-button {
   background-color: #ff0000;
+}
+
+.input-container {
+  border: none;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.input-container input {
+  border: 1px solid #000; 
+  margin-bottom: 15px;
+  width: 95%;
+  height: 40px;
+  border-radius: 5px;
+  padding-left: 10px;
+}
+
+.input-container select {
+  border: 1px solid #000; 
+  margin-bottom: 15px;
+  width: 95%;
+  height: 40px;
+  border-radius: 5px;
+}
+
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  text-indent: 1px;
+  text-overflow: '';
+}
+
+select::-ms-expand {
+  display: none;
+}
+
+select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 200px;
 }

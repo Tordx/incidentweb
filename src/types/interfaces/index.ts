@@ -18,6 +18,10 @@ export interface logindata {
 
 export interface reportdata {
 
+
+  incidenttype: string,
+  valid: string,
+  barangay: string,
   _reporttype: any,
   _report: any,
   type: string,
@@ -36,7 +40,10 @@ export interface reportdata {
   date: string,
   responded: boolean,
   recording: string,
+  responderID: string,
   responder: string,
+  archive: boolean,
+  actualincident: string,
 
 
 }

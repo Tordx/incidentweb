@@ -10,6 +10,7 @@ import ChangePhoto from 'screens/home/changephoto';
 import History from 'screens/home/history';
 import Profile from 'screens/home/Profile';
 import NotFound from 'screens/home/notfound';
+import Validate from 'screens/home/validate';
 
 
 const App: React.FC = () => {
@@ -34,6 +35,7 @@ const App: React.FC = () => {
           <Route  path="credentials" index element={ <ProtectedRoute><Credentials/></ProtectedRoute>}/>
           <Route  path="changephoto" index element={ <ProtectedRoute><ChangePhoto/></ProtectedRoute>}/>
           <Route  path="history" index element={ <ProtectedRoute><History/></ProtectedRoute>}/>
+          <Route  path="validation" index element={ <ProtectedRoute><Validate/></ProtectedRoute>}/>
           <Route  path="profile" index element={ <ProtectedRoute><Profile/></ProtectedRoute>}/>
           <Route path="*" element={<NotFound />} /> {/* Custom 404 route */}
         </Route>
