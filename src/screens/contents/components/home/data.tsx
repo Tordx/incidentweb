@@ -29,7 +29,7 @@ const barangays: string[] = [
   'Santa Maria',
 ];
 
-export default function Data({ item,  isLoading, isSuccess, onClick }: { item: reportdata[], isLoading: (e: boolean) => void, isSuccess: (e: boolean) => void, onClick: (e: any) => void, }) {
+export default function Data({ item,  isLoading, isSuccess, onClick, isDuplicate }: { item: reportdata[], isLoading: (e: boolean) => void, isSuccess: (e: boolean) => void, onClick: (e: any) => void,  isDuplicate: (e: boolean) => void}) {
 
   const data: reportdata[] = item 
   
@@ -207,6 +207,35 @@ export default function Data({ item,  isLoading, isSuccess, onClick }: { item: r
       }
     }
   };
+
+  const handlehandledAlready = async (incidentID: string) => {
+
+    isLoading(true)
+      try {
+        const incidentDocRef = doc(db, 'incident', incidentID);
+        console.log(responder)
+        const time = getCurrentTime()
+          await updateDoc(incidentDocRef, {
+          archive: true,
+          responded: true,
+          responder: responder[0].responder,
+          valid: 'invalid',
+          time: time,
+          responderID: currentUser?.uid,
+
+        }).then(() => {
+          isLoading(false)
+          isDuplicate(true)
+          
+        })
+        
+        console.log('Document successfully updated.');
+      } catch (error) {
+        isLoading(false)
+        console.error('Error updating document:', error);
+      }
+  };
+  
   
 
   return (
@@ -293,7 +322,21 @@ export default function Data({ item,  isLoading, isSuccess, onClick }: { item: r
                   </select>
                   </span>
                   }
-                  <div style = {{justifyContent: data[0].responded ? 'space-between' : 'flex-end', alignItems: 'flex-end', width: '100%', marginTop: 10}}>
+                  <div style = {{justifyContent: data[0].responded && data[0].archive ? 'space-between' : 'space-between', alignItems: 'flex-end', width: '100%', marginTop: 10}}>
+                  {data.some(item => !item.responded) ? (
+                    <button
+                      className={'enable-button'}
+                      onClick={() => {
+                        handlehandledAlready(data[0].incidentID);
+                          onClick(item);
+                        
+                      }}
+                    >
+                      Handled Already
+                    </button>
+                  ) : (
+                    <></>
+                  )}
                   {data.some(item => item.responded && !item.archive) ? (
                     <button
                       className={'enable-button'}
@@ -358,8 +401,9 @@ export default function Data({ item,  isLoading, isSuccess, onClick }: { item: r
             </div>
             <button onClick={() => {toggleIsOpen(index)}}>{isopenArray[index] ? 'Hide' : 'View'}</button>
             <br />
+            {item.valid ===  'invalid' && <span className='h4-data-padding'>Invalid Incident Report</span>}
             <span className='location-container'>
-              <span className='h4-data-padding'>Responder:</span> {data.length &&  data[0].responder ? data[0].responder : 'No responder yet'}
+              <span className='h4-data-padding'>Responder:</span> {data.length &&  item.responder ? item.responder : 'No responder yet'}
             </span>
             <br/>
           </div>

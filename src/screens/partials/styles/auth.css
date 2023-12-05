@@ -27,10 +27,12 @@
 
 /* Image container styles */
 .image-container {
+  display: flex;
   flex: 1; /* Take up 50% of the available width */
-  background: url('https://cdn.pixabay.com/photo/2015/03/17/02/01/cubes-677092_1280.png') no-repeat center center fixed;
-  background-size: cover;
+  justify-content: center;
+  align-items: center;
 }
+
 
 .login-input-container {
   

@@ -16,6 +16,7 @@ export default function Home({}) {
   const [jobdata, setjobdata] = useState<reportdata[]>([])
   const [isloading, setisloading] = useState(false);
   const [issuccess, setissuccess] = useState(false);
+  const [isduplicate, setisduplicate] = useState(false);
   const [timer, settimer] = useState(5);
   const [newalert, setnewalert] = useState(false);
   const [close, setclose] = useState(false)
@@ -102,11 +103,12 @@ export default function Home({}) {
       } else {
         settimer(5)
         setissuccess(false)
+        setisduplicate(false)
       }
     } 
     console.log(isloading)
     console.log(issuccess)
-  },[timer, issuccess])
+  },[timer, issuccess, isduplicate])
 
 
   return (
@@ -116,6 +118,15 @@ export default function Home({}) {
           <div className='loading-content'>
             <div className='spinner'></div>
             <span>loading</span>
+          </div>
+        </div>
+      }
+      {isduplicate && 
+        <div className="loading-modal">
+          <div className="loading-content success-modal">
+            <h2>Archived Success</h2>
+            <p>Make sure that this is a duplicate report.</p>
+            <a onClick={() => setisduplicate(false)} >close</a>
           </div>
         </div>
       }
@@ -143,7 +154,7 @@ export default function Home({}) {
           <p>While there are no active emergencies, it is crucial for all emergency response teams to remain on high alert and maintain readiness. Regular equipment checks, team briefings, and communication drills are essential to ensure a swift and coordinated response in case of an unforeseen incident.</p>
         </div>
         :
-        <Data item={jobdata} isLoading={setisloading} isSuccess = {setissuccess} onClick={() => {setnewalert(false)}}/>}
+        <Data item={jobdata} isLoading={setisloading} isDuplicate = {setisduplicate} isSuccess = {setissuccess} onClick={() => {setnewalert(false)}}/>}
       </div>
     </div>
   )

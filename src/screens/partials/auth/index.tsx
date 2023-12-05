@@ -74,8 +74,8 @@ getUserData();
   return (
     <div className='container'>
       <div className='inner-container'>
-         <div className='image-container'>
-          <img />
+        <div className='image-container'>
+          <img src={'https://i.imgur.com/1yHrmHy.png'} width={500} height={450} />
         </div>
         <div className='login-container'>
           <div className='login-input-container'>
@@ -95,6 +95,7 @@ getUserData();
         />
         <button type='submit' onClick={checkStatus}>Login</button>
          </div>
+         <a>forgot password</a>
          </div>
       </div>
     </div>
