@@ -34,6 +34,7 @@ import { db } from '..';
         archive: doc.data().archive,
         responderID: doc.data().responderID,
         actualincident: doc.data().actualincident,
+        contactnumber: doc.data().contactnumber
       })
     })
 

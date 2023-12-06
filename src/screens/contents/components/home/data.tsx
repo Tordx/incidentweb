@@ -292,7 +292,7 @@ export default function Data({ item,  isLoading, isSuccess, onClick, isDuplicate
                     <br/>
                     <span className='location-container'>
                       <span className='h4-data-padding'>Date/Time: </span>
-                      {formattedDate}
+                      {formattedDate} {item?.time ? `| ${item.time} `: ''}
                       </span>
                       <br/>
                       <br/>
@@ -357,7 +357,7 @@ export default function Data({ item,  isLoading, isSuccess, onClick, isDuplicate
                   <Maps coordinates = {data.length > 0 ? data[0].coordinates : [0,0]} />
                   <span className='contact-number'>
                     <h4> Reporter Contact Number:{'    '}</h4>
-                    <p>{' '}{data.length > 0 ? data[0].number : ''}</p>
+                    <p>{' '}{data.length > 0 ? data[0].contactnumber : ''}</p>
                   </span>
                   <br/>
                   <span className='report-image'>

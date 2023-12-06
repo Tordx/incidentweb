@@ -44,7 +44,7 @@ export interface reportdata {
   responder: string,
   archive: boolean,
   actualincident: string,
-
+  contactnumber: string,
 
 }
 
